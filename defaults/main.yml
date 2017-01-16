@@ -22,3 +22,4 @@ dotfiles_force_clone: "{{ false if ansible_connection == 'local' else true }}"
 # Dotfiles may reference PS1 values from liquidprompt.
 # Add it as a homeshick "castle".
 dotfiles_include_liquidprompt: true
+dotfiles_include_vim: true

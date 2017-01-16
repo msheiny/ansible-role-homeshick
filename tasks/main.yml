@@ -17,6 +17,7 @@
 - include: homeshick.yml
 
 - include: vim.yml
+  when: dotfiles_include_vim == true
 
 - include: liquidprompt.yml
   when: dotfiles_include_liquidprompt == true
