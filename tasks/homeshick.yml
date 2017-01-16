@@ -1,30 +1,25 @@
 ---
-- name: Install homeshick
-  git:
-    repo: https://github.com/andsens/homeshick
-    dest: "~{{ dotfiles_username }}/.homesick/repos/homeshick"
+- block:
+  - name: Install homeshick
+    git:
+      repo: https://github.com/andsens/homeshick
+      dest: "~{{ dotfiles_username }}/.homesick/repos/homeshick"
 
-- name: Update bashrc to have homeshick initialization
-  lineinfile:
-    dest: "~{{ dotfiles_username }}/.bashrc"
-    line: 'source "$HOME/.homesick/repos/homeshick/homeshick.sh"'
-    regexp: 'homeshick'
-    create: yes
+  - name: Clone dotfiles repo.
+    git:
+      repo: "{{ dotfiles_repo_url }}"
+      dest: "~{{ dotfiles_username }}/.homesick/repos/dotfiles"
+      version: "{{ dotfiles_repo_version }}"
+      force: "{{ dotfiles_force_clone }}"
+    register: clone_dotfiles_result
+    # The Ansible host will often have local dotfiles changes; press on.
+    ignore_errors: "{{ true if ansible_connection == 'local' else false }}"
 
-- name: Clone dotfiles repo.
-  git:
-    repo: "{{ dotfiles_repo_url }}"
-    dest: "~{{ dotfiles_username }}/.homesick/repos/dotfiles"
-    version: "{{ dotfiles_repo_version }}"
-    force: "{{ dotfiles_force_clone }}"
-  register: clone_dotfiles_result
-  # The Ansible host will often have local dotfiles changes; press on.
-  ignore_errors: "{{ true if ansible_connection == 'local' else false }}"
-
-- name: Create symlinks for dotfiles.
-  shell: >
-    ~{{ dotfiles_username|quote }}/.homesick/repos/homeshick/bin/homeshick
-    symlink dotfiles --force --verbose
-    | awk '{ print $2 }' | sort | uniq
-  register: symlink_dotfiles_result
-  changed_when: "'identical' not in symlink_dotfiles_result.stdout"
+  - name: Create symlinks for dotfiles.
+    shell: >
+      ~{{ dotfiles_username|quote }}/.homesick/repos/homeshick/bin/homeshick
+      symlink dotfiles --force --verbose
+      | awk '{ print $2 }' | sort | uniq
+    register: symlink_dotfiles_result
+    changed_when: "'identical' not in symlink_dotfiles_result.stdout"
+  become_user: "{{ dotfiles_username }}"
