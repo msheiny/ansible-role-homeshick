@@ -23,3 +23,6 @@ dotfiles_force_clone: "{{ false if ansible_connection == 'local' else true }}"
 # Add it as a homeshick "castle".
 dotfiles_include_liquidprompt: true
 dotfiles_include_vim: true
+
+# Shell config file to make edits to
+dotfiles_shell_conf: .bashrc
